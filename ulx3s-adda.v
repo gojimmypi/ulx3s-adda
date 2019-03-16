@@ -45,9 +45,9 @@ module top(
 		o_value[7:0] <= i_ad_port_value; // J2_AD_PORT[7:0] && ctr[7:0];
 		// o_led[5:0] <= o_value[7:0]; // ctr[23:18];
 		// works: o_led[6:6] <= ctr[23:23];
-		o_led[7:1] <= i_ad_port_value[7:1];
-		o_led[0:0] <=  ctr[23:23];
-		o_AD_TRIG <= ctr[23:23];
+		o_led[7:0] <= i_ad_port_value[7:0];
+		// o_led[0:0] <=  ctr[23:23];
+		o_AD_TRIG <= ctr[0:0];
 
 	end
 
