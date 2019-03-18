@@ -6,7 +6,7 @@ ARACHNE = arachne-pnr
 ARACHNE_ARGS = 
 ICEPACK = icepack
 ICETIME = icetime
-ICEPROG = iceprog
+ICEPROG = ../f32c_tools/ujprog/ujprog.exe
 
 all: $(PROJ).bit
 	@printf "$(PROJ).bit done!"
@@ -26,7 +26,7 @@ all: $(PROJ).bit
 		
 
 %.json: $(PROJ).ys $(PROJ).v
-	yosys $(PROJ).ys 
+	yosys $(PROJ).ys | tee $(PROJ).yosys.log
 
 #%.blif: %.v
 	#printf "yosys..."
@@ -47,15 +47,17 @@ all: $(PROJ).bit
 %.rpt: %.asc
 	$(ICETIME) -d $(DEVICE) -mtr $@ $<
 
-prog: $(PROJ).bin
-	$(ICEPROG) -S $<
+prog: $(PROJ).bit
+	grep -i warning $(PROJ).nextpnr-ecp5.log
+	grep -i warning $(PROJ).yosys.log
+	$(ICEPROG)  $<
 
 sudo-prog: $(PROJ).bin
 	@echo 'Executing prog as root!!!'
-	sudo $(ICEPROG) -S $<
+	sudo $(ICEPROG) $<
 
 clean:
-	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).rpt $(PROJ).bit $(PROJ).json $(PROJ).out.config
+	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).rpt $(PROJ).bit $(PROJ).json $(PROJ).out.config $(PROJ).nextpnr-ecp5.log $(PROJ).yosys.log
 
 .SECONDARY:
 .PHONY: all prog clean
