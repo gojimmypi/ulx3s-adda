@@ -12,6 +12,8 @@ module top(
   output wifi_gpio0
 );
 
+
+error we are not using this file!
  
 
 	wire i_clk;
