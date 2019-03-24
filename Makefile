@@ -8,7 +8,9 @@ ARACHNE_ARGS =
 # ICEPACK = icepack
 ICETIME = icetime
 ICEPROG = ../f32c_tools/ujprog/ujprog.exe
+IS_WSL = 0  
 
+ 
 
 # Verilator
 
@@ -21,6 +23,10 @@ BINFILE := $(TOPMOD).bin
 SIMFILE := $(SIMPROG).cpp
 VDIRFB  := ./obj_dir
 #COSIMS  := uartsim.cpp
+
+SHELL=bash
+
+
 all: $(VCDFILE)
 
 GCC := g++
@@ -88,6 +94,8 @@ all: $(PROJ).bit
 %.bit: $(PROJ).out.config
 	@printf "\n\n bit ecppack...\n\n"
 	ecppack $(PROJ).out.config $(PROJ).bit --idcode 0x21111043
+	grep -i warning $(PROJ).nextpnr-ecp5.log
+	grep -i warning $(PROJ).yosys.log
 
 %.out.config: $(PROJ).json
 	@printf "\n\n nextpnr-ecp5 config... \n\n "
@@ -120,8 +128,6 @@ all: $(PROJ).bit
 	$(ICETIME) -d $(DEVICE) -mtr $@ $<
 
 prog: $(PROJ).bit
-	grep -i warning $(PROJ).nextpnr-ecp5.log
-	grep -i warning $(PROJ).yosys.log
 	$(ICEPROG)  $<
 
 sudo-prog: $(PROJ).bin
@@ -131,6 +137,30 @@ sudo-prog: $(PROJ).bin
 clean:
 	rm -rf $(VDIRFB)/ $(SIMPROG) $(VCDFILE) blinky/ $(BINFILE) $(RPTFILE)
 	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).rpt $(PROJ).bit $(PROJ).json $(PROJ).out.config $(PROJ).nextpnr-ecp5.log $(PROJ).yosys.log
+
+sim: 
+	rm -f ulx3s_adda.vcd
+	iverilog  -o $(PROJ).vvp $(PROJ).v $(PROJ)_tb.v
+	vvp $(PROJ).vvp
+	export DISPLAY=:0
+
+## if we are running in WSL, we need a bit of help for GUI XWindows: copy .Xauthority file locally.
+## sometimes the WSL username is not the same as the Windows username, and we need the windows user path.
+## this is the Windows %USER% environment variable when called from makefile: $(shell cmd.exe /c "echo $$USER")
+	@if [ "$(shell grep Microsoft /proc/version)" != "" ]; then   \
+		cp /mnt/c/cygwin64/home/$(shell cmd.exe /c "echo $$USER")/.Xauthority   ~/.Xauthority; \
+    fi
+
+	(gtkwave $(PROJ).vcd $(PROJ)_savefile.gtkw)&
+
+xserver:
+## launch the Windows cygwin64 startxwin when WSL iss detected
+	@if [ "$(shell grep Microsoft /proc/version)" != "" ]; then   \
+		echo "Launching Windows XServer from WSL...";             \
+		(/mnt/c/cygwin64/bin/run.exe --quote /usr/bin/bash.exe -l -c " exec /usr/bin/startxwin -- -listen tcp -nowgl")&  \
+	else                                                          \
+		echo "Not launching WSL XServer!" ;                                             \
+    fi
 
 .SECONDARY:
 .PHONY: all prog clean

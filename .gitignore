@@ -5,3 +5,11 @@
 /.vs
 /.recovery
 /ulx3s-adda.json
+/ulx3s_adda.vcd
+/ulx3s_adda.nextpnr-ecp5.log
+/ulx3s_adda.out.config
+/ulx3s_adda.json
+/ulx3s_adda.bit
+/ulx3s_out.config
+/ulx3s_adda.yosys.log
+/.setting.ini
