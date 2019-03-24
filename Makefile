@@ -139,7 +139,7 @@ clean:
 	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).rpt $(PROJ).bit $(PROJ).json $(PROJ).out.config $(PROJ).nextpnr-ecp5.log $(PROJ).yosys.log
 
 sim: 
-	rm -f ulx3s_adda.vcd
+	rm -f $(PROJ).vcd
 	iverilog  -o $(PROJ).vvp $(PROJ).v $(PROJ)_tb.v
 	vvp $(PROJ).vvp
 	export DISPLAY=:0
