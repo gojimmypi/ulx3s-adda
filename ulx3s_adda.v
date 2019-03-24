@@ -1,10 +1,11 @@
+`timescale 1 ns / 100 ps
+
 `ifdef VERILATOR
 /* verilator lint_off UNUSED */		 
-module ulx3s_adda
-  (input  i_clk, 
-	 input  i_reset,
-   input  [6:0] btn, 
-   output [7:0] o_led,
+module ulx3s_adda (
+  input  i_clk, 
+  input  reset,
+  output [7:0] o_led,
 	 output o_AD_CLK,
 	 input  [7:0] J2_AD_PORT,
 	 output o_DA_CLK,
@@ -12,7 +13,6 @@ module ulx3s_adda
 /* verilator lint_on UNUSED */
 
     wire i_clk;
-    wire [6:0] btn;
     wire [7:0] o_led;
 	
   wire o_AD_CLK;
@@ -26,8 +26,7 @@ module ulx3s_adda
 
 module top(
   input clk_25mhz,
-	input i_reset,
-  input [6:0] btn,
+//	input reset,
   output [7:0] led,
 
   output J2_AD_CLK,
@@ -44,11 +43,14 @@ module top(
 	// Tie GPIO0 high to keep board from rebooting
     assign wifi_gpio0 = 1'b1;
 
+	//wire i_reset;
+	//assign i_reset = btn[0];
+
 
 	// A/D Input Clock
 	// "The pipelined architecture of the AD9280 operates on both rising and falling edges of the input clock.
 	// The AD9280 is designed to support a conversion rate of 32 MSPS; running the part at slightly faster clock rates may
-    // be possible, although at reduced performance levels." (see AD9280 datasheet, page 15)
+	// be possible, although at reduced performance levels." (see AD9280 datasheet, page 15)
 	wire o_AD_CLK;
 	assign J2_AD_CLK = o_AD_CLK; // = i_clk;
 	assign o_AD_CLK = clk_25mhz;
@@ -86,6 +88,11 @@ module top(
 	localparam ctr_width = 32;
     reg [ctr_width-1:0] ctr = 32'b1111_1111_1111_1111_1111_1111_1111_1111;
 
+	// 14ns after edge, data is stable (we'll use 16ns)
+	specify 
+		(J2_AD_PORT => i_ad_port_value) = 16;
+	endspecify
+
   always @(posedge i_clk) begin
 		// 14ns after edge, data is stable
 		ctr <= ctr + 1;
@@ -100,6 +107,7 @@ module top(
 		// J2_AD_CLK <= ctr[0:0];
 		// J2_DA_CLK <=   ctr[0:0];
 		o_value[7:0] <= i_ad_port_value[7:0];
+		//reset <= i_reset;
 	end
 
 endmodule
