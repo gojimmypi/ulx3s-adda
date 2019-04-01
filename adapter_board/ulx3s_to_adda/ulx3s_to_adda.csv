@@ -1,0 +1,7 @@
+"Id";"Designator";"Package";"Quantity";"Designation";"Supplier and ref";
+1;"R1";"PinHeader_Dual_1x2_P2.54mm_TestPoint.kicad_mod";1;"0";;;
+2;"J5,J4";"PinHeader_2x17_P2.54mm_Vertical";2;"Conn_02x17_Odd_Even";;;
+3;"J2";"PinHeader_2x20_P2.54mm_Vertical";1;"ULX3S HEADER";;;
+4;"J1";"PinHeader_2x20_P2.54mm_Horizontal";1;"ULX3S HEADER";;;
+5;"J3";"PinHeader_1x20_Dual_P2.54mm_Vertical_TestPoint";1;"Conn_Dual_01x20_Male_Testpoint";;;
+6;"MH1,MH4,MH3,MH2";"MountingHole_3.2mm_M3_ISO14580_Pad";4;"MountingHole";;;

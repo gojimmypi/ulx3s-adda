@@ -1,0 +1,24 @@
+Drill report for C:/workspace/ulx3s-adda/adapter_board/ulx3s_to_adda/ulx3s_to_adda.kicad_pcb
+Created on 3/31/2019 7:03:48 PM
+
+Copper Layer Stackup:
+    =============================================================
+    L1 :  F.Cu                      front
+    L2 :  B.Cu                      back
+
+
+Drill file 'ulx3s_to_adda-PTH.drl' contains
+    plated through holes:
+    =============================================================
+    T1  0.70mm  0.028"  (2 holes)
+    T2  1.00mm  0.039"  (188 holes)
+    T3  3.20mm  0.126"  (4 holes)
+
+    Total plated holes count 194
+
+
+Drill file 'ulx3s_to_adda-NPTH.drl' contains
+    unplated through holes:
+    =============================================================
+
+    Total unplated holes count 0
