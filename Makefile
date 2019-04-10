@@ -1,6 +1,7 @@
 PROJ = ulx3s_adda
 PIN_DEF = ulx3s_v20.lpf
 DEVICE = up5k
+LUT_SIZE = 25k
 
 ARACHNE = arachne-pnr 
 ARACHNE_ARGS = 
@@ -10,7 +11,6 @@ ICETIME = icetime
 ICEPROG = ../f32c_tools/ujprog/ujprog.exe
 IS_WSL = 0  
 
- 
 
 # Verilator
 
@@ -63,11 +63,6 @@ test: $(VCDFILE)
 $(VCDFILE): $(SIMPROG)
 	./$(SIMPROG)
 
-
-
-
-
-
 ##
 ## Find all of the Verilog dependencies and submodules
 ##
@@ -83,25 +78,35 @@ include $(DEPS)
 endif
 endif
 
+help: 
+	@printf " --all          main build of everything to create $(PROJ).bit   \n"
+	@printf " --clean        remove files that are created with this Makefile \n"
+	@printf " --install      install toolchain and all dependencies           \n"
+	@printf " --prog         create binary file and upload using $(ICEPROG)   \n"
+	@printf " --sim          run iverilog and then launch gtkwave for $(PROJ) \n"
+	@printf " --xserver      primaily for WSL users, load cygwin64 startxwin  \n"
+	@printf "                                                                 \n"
+	@printf "Project-named parameters:                                        \n"
+	@printf " --$(PROJ).bit  same as --all                                    \n"
+	@printf "                                                                 \n"
+
 
 # main build
 all: $(PROJ).bit
 	@printf "\n\n $(PROJ).bit done! \n\n"
 	ls $(PROJ).bit -al
 
- 
 
 %.bit: $(PROJ).out.config
 	@printf "\n\n bit ecppack...\n\n"
-	ecppack $(PROJ).out.config $(PROJ).bit --idcode 0x21111043
-	grep -i warning $(PROJ).nextpnr-ecp5.log
-	grep -i warning $(PROJ).yosys.log
+	ecppack $(PROJ)_out.config $(PROJ).bit --idcode 0x21111043
+	grep -i warning $(PROJ).nextpnr-ecp5.log || true
+	grep -i warning $(PROJ).yosys.log        || true
 
-%.out.config: $(PROJ).json
+%_out.config: $(PROJ).json
 	@printf "\n\n nextpnr-ecp5 config... \n\n "
-	nextpnr-ecp5 --25k --json $(PROJ).json  \
-		--lpf ulx3s_v20.lpf \
-		--textcfg $(PROJ).out.config --log  $(PROJ).nextpnr-ecp5.log
+	nextpnr-ecp5 --$(LUT_SIZE) --json $(PROJ).json --lpf $(PIN_DEF) \
+                 --textcfg $(PROJ).out.config --log  $(PROJ).nextpnr-ecp5.log
 		
 
 %.json: $(PROJ).ys $(PROJ).v
@@ -121,7 +126,7 @@ all: $(PROJ).bit
 
 
 %.bin: %.asc
-	@printf "bin..."
+	@printf ""\n\n bin... "\n\n"
 	$(ICEPACK) $< $@
 
 %.rpt: %.asc
@@ -131,10 +136,11 @@ prog: $(PROJ).bit
 	$(ICEPROG)  $<
 
 sudo-prog: $(PROJ).bin
-	@echo 'Executing prog as root!!!'
+	@printf '"\n\n Executing prog as root!!! "\n\n'
 	sudo $(ICEPROG) $<
 
 clean:
+	@printf ""\n\n clean... "\n\n"
 	rm -rf $(VDIRFB)/ $(SIMPROG) $(VCDFILE) blinky/ $(BINFILE) $(RPTFILE)
 	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).rpt $(PROJ).bit $(PROJ).json $(PROJ).out.config $(PROJ).nextpnr-ecp5.log $(PROJ).yosys.log
 
@@ -161,6 +167,10 @@ xserver:
 	else                                                          \
 		echo "Not launching WSL XServer!" ;                                             \
     fi
+
+install:
+	git clone https://gist.github.com/gojimmypi/f96cd86b2b8595b4cf3be4baf493c5a7 ULX3S_WSL_Toolchain.sh
+	@printf "\n\n  ULX3S_WSL_Toolchain.sh fetched; review, edit for your device if desired, then run it. ... \n\n "
 
 .SECONDARY:
 .PHONY: all prog clean
