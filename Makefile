@@ -97,7 +97,7 @@ all: $(PROJ).bit
 	ls $(PROJ).bit -al
 
 
-%.bit: $(PROJ).out.config
+%.bit: $(PROJ)_out.config
 	@printf "\n\n bit ecppack...\n\n"
 	ecppack $(PROJ)_out.config $(PROJ).bit --idcode 0x21111043
 	grep -i warning $(PROJ).nextpnr-ecp5.log || true
@@ -106,7 +106,7 @@ all: $(PROJ).bit
 %_out.config: $(PROJ).json
 	@printf "\n\n nextpnr-ecp5 config... \n\n "
 	nextpnr-ecp5 --$(LUT_SIZE) --json $(PROJ).json --lpf $(PIN_DEF) \
-                 --textcfg $(PROJ).out.config --log  $(PROJ).nextpnr-ecp5.log
+                 --textcfg $(PROJ)_out.config --log  $(PROJ).nextpnr-ecp5.log
 		
 
 %.json: $(PROJ).ys $(PROJ).v
@@ -142,7 +142,7 @@ sudo-prog: $(PROJ).bin
 clean:
 	@printf ""\n\n clean... "\n\n"
 	rm -rf $(VDIRFB)/ $(SIMPROG) $(VCDFILE) blinky/ $(BINFILE) $(RPTFILE)
-	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).rpt $(PROJ).bit $(PROJ).json $(PROJ).out.config $(PROJ).nextpnr-ecp5.log $(PROJ).yosys.log
+	rm -f $(PROJ).blif $(PROJ).asc $(PROJ).rpt $(PROJ).bit $(PROJ).json $(PROJ)_out.config $(PROJ).nextpnr-ecp5.log $(PROJ).yosys.log
 
 sim: 
 	rm -f $(PROJ).vcd
