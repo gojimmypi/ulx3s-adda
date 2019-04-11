@@ -154,7 +154,7 @@ sim:
 ## sometimes the WSL username is not the same as the Windows username, and we need the windows user path.
 ## this is the Windows %USER% environment variable when called from makefile: $(shell cmd.exe /c "echo $$USER")
 	@if [ "$(shell grep Microsoft /proc/version)" != "" ]; then   \
-		cp /mnt/c/cygwin64/home/$(shell cmd.exe /c "echo $$USER")/.Xauthority   ~/.Xauthority; \
+		cp /mnt/c/cygwin64/home/$(shell cmd.exe /c "echo %USERNAME%")/.Xauthority   ~/.Xauthority; \
     fi
 
 	(gtkwave $(PROJ).vcd $(PROJ)_savefile.gtkw)&
