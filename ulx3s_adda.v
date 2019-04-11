@@ -1,56 +1,56 @@
-`timescale 1 ns / 100 ps
-
 `ifdef VERILATOR
 /* verilator lint_off UNUSED */		 
 module ulx3s_adda (
-  input  i_clk, 
-  input  reset,
-  output [7:0] o_led,
-	 output o_AD_CLK,
-	 input  [7:0] J2_AD_PORT,
-	 output o_DA_CLK,
-	 output [7:0] J2_DA_PORT);
+	input  i_clk, 
+	input  [6:0] btn, 
+	output [7:0] o_led,
+	output o_AD_CLK,
+	input  [7:0] J2_AD_PORT,
+	output o_DA_CLK,
+	output [7:0] J2_DA_PORT,
+	output wifi_gpio0);
 /* verilator lint_on UNUSED */
 
-    wire i_clk;
-    wire [7:0] o_led;
+	wire i_clk;
+	wire [6:0] btn;
+	wire [7:0] o_led;
 	
-  wire o_AD_CLK;
-  wire  [7:0] i_ad_port_value;
+	wire o_AD_CLK;
+	wire [7:0] i_ad_port_value;
 
-  wire o_DA_CLK;
-  wire [7:0] o_value;
+	wire o_DA_CLK;
+	wire [7:0] o_value;
 
 `else
 
-
 module top(
-  input clk_25mhz,
-//	input reset,
-  output [7:0] led,
+	// here, all the inputs at the top module are defined in the constraint file
+	input clk_25mhz,
+	input [6:0] btn,
+	output [7:0] led,
 
-  output J2_AD_CLK,
-  input  [7:0] J2_AD_PORT,
+	output J2_AD_CLK,
+	input  [7:0] J2_AD_PORT,
 
-  output J2_DA_CLK,
-  output [7:0] J2_DA_PORT,
+	output J2_DA_CLK,
+	output [7:0] J2_DA_PORT,
 
-  output wifi_gpio0
+	output wifi_gpio0
 );
+
 	wire i_clk;
+
+	reg [6:0] i_btn;
 	assign i_clk = clk_25mhz;
 
 	// Tie GPIO0 high to keep board from rebooting
-    assign wifi_gpio0 = 1'b1;
-
-	//wire i_reset;
-	//assign i_reset = btn[0];
+	assign wifi_gpio0 = 1'b1;
 
 
 	// A/D Input Clock
 	// "The pipelined architecture of the AD9280 operates on both rising and falling edges of the input clock.
 	// The AD9280 is designed to support a conversion rate of 32 MSPS; running the part at slightly faster clock rates may
-	// be possible, although at reduced performance levels." (see AD9280 datasheet, page 15)
+  	// be possible, although at reduced performance levels." (see AD9280 datasheet, page 15)
 	wire o_AD_CLK;
 	assign J2_AD_CLK = o_AD_CLK; // = i_clk;
 	assign o_AD_CLK = clk_25mhz;
@@ -86,7 +86,7 @@ module top(
 	//end
 
 	localparam ctr_width = 32;
-    reg [ctr_width-1:0] ctr = 32'b1111_1111_1111_1111_1111_1111_1111_1111;
+  reg [ctr_width-1:0] ctr = 32'b1111_1111_1111_1111_1111_1111_1111_1111;
 
 	// 14ns after edge, data is stable (we'll use 16ns)
 	specify 
@@ -94,9 +94,9 @@ module top(
 	endspecify
 
   always @(posedge i_clk) begin
-		// 14ns after edge, data is stable
+		i_btn[6:0] = btn[6:0];
 		ctr <= ctr + 1;
-		 i_ad_port_value[7:0] <= J2_AD_PORT[7:0];
+  	i_ad_port_value[7:0] <= J2_AD_PORT[7:0];
 		// o_value[7:0] <= i_ad_port_value; // J2_AD_PORT[7:0] && ctr[7:0];
 		// o_led[5:0] <= o_value[7:0]; // ctr[23:18];
 		// works: o_led[6:6] <= ctr[23:23];
@@ -107,7 +107,6 @@ module top(
 		// J2_AD_CLK <= ctr[0:0];
 		// J2_DA_CLK <=   ctr[0:0];
 		o_value[7:0] <= i_ad_port_value[7:0];
-		//reset <= i_reset;
 	end
 
 endmodule

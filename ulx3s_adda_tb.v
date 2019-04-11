@@ -3,7 +3,7 @@ module ulx3s_adda_tb;
 
    // initial values
   reg i_clk_tb  = 1'b0;
-
+  wire [6:0] i_btn;
   wire [7:0] o_led_tb;
 
   reg i_J2_AD_CLK_tb = 1'b0;
@@ -35,5 +35,12 @@ module ulx3s_adda_tb;
 	   #40 i_clk_tb = ~i_clk_tb;
 
    // stap of module
-   top s(i_clk_tb, o_led_tb, o_J2_AD_CLK_tb, i_J2_AD_PORT_tb, o_J2_DA_CLK_tb, o_J2_DA_PORT_tb, o_wifi_gpio0_tb);
+   top s(i_clk_tb, 
+         i_btn,
+         o_led_tb, 
+         o_J2_AD_CLK_tb, 
+         i_J2_AD_PORT_tb, 
+         o_J2_DA_CLK_tb, 
+         o_J2_DA_PORT_tb, 
+         o_wifi_gpio0_tb);
 endmodule
