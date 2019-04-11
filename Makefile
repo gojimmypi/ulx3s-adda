@@ -148,7 +148,6 @@ sim:
 	rm -f $(PROJ).vcd
 	iverilog  -o $(PROJ).vvp $(PROJ).v $(PROJ)_tb.v
 	vvp $(PROJ).vvp
-	export DISPLAY=:0
 
 ## if we are running in WSL, we need a bit of help for GUI XWindows: copy .Xauthority file locally.
 ## sometimes the WSL username is not the same as the Windows username, and we need the windows user path.
@@ -157,7 +156,10 @@ sim:
 		cp /mnt/c/cygwin64/home/$(shell cmd.exe /c "echo %USERNAME%")/.Xauthority   ~/.Xauthority; \
     fi
 
-	(gtkwave $(PROJ).vcd $(PROJ)_savefile.gtkw)&
+	# spawn a new process for gtkwave
+	(export DISPLAY=:0; 
+	 gtkwave $(PROJ).vcd $(PROJ)_savefile.gtkw
+	)&
 
 xserver:
 ## launch the Windows cygwin64 startxwin when WSL iss detected
@@ -165,7 +167,7 @@ xserver:
 		echo "Launching Windows XServer from WSL...";             \
 		(/mnt/c/cygwin64/bin/run.exe --quote /usr/bin/bash.exe -l -c " exec /usr/bin/startxwin -- -listen tcp -nowgl")&  \
 	else                                                          \
-		echo "Not launching WSL XServer!" ;                                             \
+		echo "Not launching WSL XServer!" ;                       \
     fi
 
 install:
