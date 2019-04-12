@@ -171,8 +171,15 @@ xserver:
     fi
 
 install:
-	git clone https://gist.github.com/gojimmypi/f96cd86b2b8595b4cf3be4baf493c5a7 ULX3S_WSL_Toolchain
-	@printf "\n\n  ULX3S_WSL_Toolchain.sh fetched; review, edit for your device if desired, then run it. ... \n\n "
+#	git clone https://gist.github.com/gojimmypi/f96cd86b2b8595b4cf3be4baf493c5a7 ULX3S_WSL_Toolchain
+#	@printf "\n\n  ULX3S_WSL_Toolchain.sh fetched; review, edit for your device if desired, then run it. ... \n\n "
+
+	@if [ ! -d "ULX3S_WSL_Toolchain" ]; then  \
+		git clone https://gist.github.com/gojimmypi/f96cd86b2b8595b4cf3be4baf493c5a7 ULX3S_WSL_Toolchain; \
+		@printf "\n\n  ULX3S_WSL_Toolchain.sh fetched; review, edit for your device if desired, then run it. ... \n\n "; \
+#	else \
+#		@printf "\n\n  ULX3S_WSL_Toolchain.sh already installed; run it. ... \n\n "; \
+	fi 
 
 .SECONDARY:
 .PHONY: all prog clean
